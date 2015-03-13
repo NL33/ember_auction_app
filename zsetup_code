@@ -136,8 +136,41 @@ Auctioner.NewCategoryController = Ember.Controller.extend({
 6. load new controller into index.html:
 <script src="controllers/new-category.js"></script>
 
+****
 
+***Add individual categories ***
 
+1. *router.js:
+  this.resource('category', {path: 'categories/:category_id'}); 
+
+2. *routes/category.js
+Auctioner.CategoryRoute = Ember.Route.extend({
+  model: function(params){ 
+    return this.store.find('category', params.category_id); 
+});
+
+3. *Add to index.html
+<script src="routes/category.js"></script>
+
+4. *create category template
+templates/category.hbs:
+<h2> Category: </h2>
+
+<h3>{{name}}</h3>
+
+5. *load into index.html:
+ <script>
+    EmberHandlebarsLoader.loadTemplates(['categories', 'application', 'new-category', 'category'
+    ]);
+  </script>
+
+6. *If not already, link to category from the home page:
+templates/categories.hbs:
+<ul>
+  {{#each category in model}}
+    <li>{{#link-to 'category' category}}{{category.name}}{{/link-to}}</li>
+  {{/each}}
+</ul>
 
 
 

@@ -2,7 +2,7 @@
 
 <ul>
   {{#each category in model}}
-    <li>{{category.name}}</li>
+    <li>{{#link-to 'category' category}}{{category.name}}{{/link-to}}</li>
   {{/each}}
 </ul>
 
