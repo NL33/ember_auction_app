@@ -1,0 +1,11 @@
+<h1> The Auction Site! </h1>
+
+<ul>
+  {{#each category in model}}
+    <li>{{#link-to 'category' category}}{{category.name}}{{/link-to}}</li>
+  {{/each}}
+</ul>
+
+<p><a href='#' {{action 'sortByName'}}>Sort By Name</a></p>
+
+<p>{{#link-to 'new-category' classNames="btn btn-primary"}}New Category{{/link-to}}</p>
