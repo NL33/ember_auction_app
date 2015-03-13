@@ -1,1 +1,1 @@
-Auctioner = Ember.Application.create()
+Auctioner = Ember.Application.create();

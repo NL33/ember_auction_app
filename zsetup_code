@@ -1,6 +1,9 @@
 View locally: $ python -m SimpleHTTPServer
+view at localhost:8000
 
 Basic Setup:
+
+NOTE: using "additionallibs" (not libs) for better performance
 
 1.	*create auctioner.js
 Auctioner = Ember.Application.create()
@@ -14,8 +17,10 @@ Auctioner.Router.map(function() {
 Auctioner.ApplicationSerializer = DS.LSSerializer.extend(); 
 Auctioner.ApplicationAdapter = DS.LSAdapter.extend(); 
 
+4. *add store.js to index.html:
+<script src="store.js"></script>
 
-4. *index.html
+5. *index.html
 <script src="auctioner.js"></script>
 <script src="router.js"></script>
 
@@ -23,7 +28,7 @@ Auctioner.ApplicationAdapter = DS.LSAdapter.extend();
     EmberHandlebarsLoader.loadTemplates(['categories', 'application']);
   </script>
 
-5.	*template/application.hbs
+6.	*template/application.hbs
 <div class='container'>
   <nav class='navbar navbar-default' role='navigation'>
     <ul class='nav navbar-nav'>
@@ -34,12 +39,12 @@ Auctioner.ApplicationAdapter = DS.LSAdapter.extend();
   {{outlet}}
 </div>
 
-5.	*template/categories.hbs
+7.	*template/categories.hbs
 <h1> The Auction Site! </h1>
 
 <ul>
   {{#each category in model}}
-    <li>{{#link-to 'category' category}}{{category.name}}{{/link-to}}</li>
+    <li>{{#link-to 'category' category}}{{category.name}}{{/link-to}}</li>  //Note: link-to tags here will not work until add individual category functionality
   {{/each}}
 </ul>
 
@@ -48,18 +53,90 @@ Auctioner.ApplicationAdapter = DS.LSAdapter.extend();
 <p>{{#link-to 'new-category' classNames="btn btn-primary"}}New Category{{/link-to}}</p>
 ****
 
-***Add Ability to add Categories:***
+***Add basic Categories functionality:***
 
 1.	*Create Categories model:
 models/category.js:
 
 Auctioner.Category = DS.Model.extend({    //creates and Ember data model. Then specify the properties of this class:
   name: DS.attr(), 
-  items: DS.hasMany('item', {async: true})
+  //items: DS.hasMany('item', {async: true}) //have to add after creating the 'item' model
 });
 
 2. *Add script tag to index.html
 <script src="models/category.js"></script>
+
+3. *Add model to the routes:
+routes/categories.js:
+
+Auctioner.CategoriesRoute = Ember.Route.extend({
+  model: function(){ 
+    return this.store.find('category');
+  } 
+});
+
+4. *load new routes file in index.html:
+<script src="routes/categories.js"></script>
+
+****
+
+
+***Add Ability ability to create categories:***
+
+1. *Add 'new-category' route
+
+router.js: 
+  this.resource('new-category');
+
+
+2. *templates/categories.hbs:
+
+<p>{{#link-to 'new-category' classNames="btn btn-primary"}}New Category{{/link-to}}</p>
+
+
+3. *create new-category template:
+templates/new-category.hbs:
+
+<h1> New Category </h1>
+
+  <form>
+    <div class="form-group">
+      <label for="name">Name</label>
+      {{input value=name id="name" class="form-control"}}
+    </div>
+
+    <button class="btn btn-primary" {{action 'save'}}>Save</button>
+  </form>
+
+
+4. *load template into index.html:
+ <script>
+    EmberHandlebarsLoader.loadTemplates(['categories', 'application', 'new-category'
+    ]);
+  </script>
+
+
+5. *define save action in new controller:
+controllers/new-category.js:
+
+Auctioner.NewCategoryController = Ember.Controller.extend({  
+  actions: {
+    save: function() {
+     var newCategory = this.store.createRecord('category', {  
+      name: this.get('name') 
+      }); 
+         
+         newCategory.save(); 
+         this.transitionToRoute('categories'); 
+      }
+  }
+});
+
+
+6. load new controller into index.html:
+<script src="controllers/new-category.js"></script>
+
+
 
 
 

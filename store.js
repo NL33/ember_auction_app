@@ -1,2 +1,2 @@
-Auctioner.ApplicationSerializer = DS.LSSerializer.extend(); //sets up Ember to use Ember data with local storage adapter
-Auctioner.ApplicationAdapter = DS.LSAdapter.extend(); //DS stands for datastore, which is how we call Ember data
+Auctioner.ApplicationSerializer = DS.LSSerializer.extend(); 
+Auctioner.ApplicationAdapter = DS.LSAdapter.extend();

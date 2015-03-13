@@ -1,4 +1,5 @@
 Auctioner.CategoriesRoute = Ember.Route.extend({
-  model: function(params){ 
-  	return this.store.find('category'); 
+  model: function(){ 
+  	return this.store.find('category');
+  } 
 });
