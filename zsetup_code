@@ -138,7 +138,7 @@ Auctioner.NewCategoryController = Ember.Controller.extend({
 
 ****
 
-***Add individual categories ***
+***Add individual categories show pages***
 
 1. *router.js:
   this.resource('category', {path: 'categories/:category_id'}); 
