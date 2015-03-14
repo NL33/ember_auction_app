@@ -308,6 +308,8 @@ Auctioner.NewItemController = Ember.Controller.extend({
 
 {{outlet}}
 
+**NOTE: Bootstrap well styling is used here within column format within a loop
+
 
 9) *update the categories template to display items below each category
 
