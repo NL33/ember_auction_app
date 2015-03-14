@@ -175,25 +175,24 @@ templates/categories.hbs:
 
 ***Create items within Categories***
 
-1) *create item model, and link to category
+1) *create item model, and link to category:
 models/item.js:
 
 Auctioner.Item = DS.Model.extend({    
   name: DS.attr(),
-  desctiption: DS.attr(),
+  description: DS.attr(),
   owner: DS.attr(),
   estimated_price: DS.attr(),
-  backstory: DS.attr(),
-  category: DS.belongsTo('category', {async: true}); 
+  category: DS.belongsTo('category', {async: true}) 
 });
 
 
-2) *add to index.html:
+2) *add model file to index.html:
 
 <script src="models/item.js"></script>
 
 
-3) *update category model to reflect relationship
+3) *update category model to reflect relationship to comment model:
 models/category.js:
 
 Auctioner.Category = DS.Model.extend({    
@@ -206,24 +205,21 @@ Auctioner.Category = DS.Model.extend({
 router.js
 (nest new item within category, because that is where new item will be created):
 
-Auctioner.Item = DS.Model.extend({    
-  name: DS.attr(),
-  desctiption: DS.attr(),
-  owner: DS.attr(),
-  estimated_price: DS.attr(),
-  backstory: DS.attr(),
-  image_url: DS.attr(),
-  category: DS.belongsTo('category', {async: true}); 
+Auctioner.Router.map(function() { 
+  this.resource('categories', {path: '/'});  //categories will be home page
+  this.resource('new-category');
+  this.resource('category', {path: ':category_id'}, function() {
+    this.resource('new-item')
+  });   
 });
 
 
+5) *create new-item template:
+templates/new-item.js:
 
-
-5) *create new-item template
 <h3>New item</h3>
-
 <form>
-  <div class="form-group">
+   <div class="form-group">
       <label for="name">Name</label>
       {{input value=name  id="name"  class="form-control"}}
     </div>
@@ -234,7 +230,7 @@ Auctioner.Item = DS.Model.extend({
     </div>
 
     <div class="form-group">
-      <label for="body">Description</label>
+      <label for="description">Description</label>
       {{textarea value=description  id="description" class="form-control" rows="5"}}
     </div>
 
@@ -243,17 +239,7 @@ Auctioner.Item = DS.Model.extend({
       {{input value=estimated_price  id="estimated_price"  class="form-control"}}
     </div>
 
-    <div class="form-group">
-      <label for="backstory">Backstory</label>
-      {{textarea value=backstory  id="backstory" class="form-control" rows="15"}}
-    </div>
-
-   <div class="form-group">
-    <label for="image_url">Image Url</label>
-    {{input value=image_url id="image_url" class="form-control"}}
-  </div>
-
-  <button class="btn btn-primary" {{action 'save'}}>Save</button>
+    <button class="btn btn-primary" {{action 'save'}}>Save</button>
 </form>
 
 
@@ -264,9 +250,10 @@ Auctioner.Item = DS.Model.extend({
     ]);
   </script>
 
-6) *create controller to handle save action
+
+6) *create controller to handle save action in new-item template:
 controllers/new-item.js
-OLD WAY:
+
 Auctioner.NewItemController = Ember.Controller.extend({  
   needs: ['category'], //needs: ember's way of allowing you to access one controller from another. You just list any controllers that you need access to. Here, we have said we need the post controller, which we use at the end of this controller below
   actions: { 
@@ -279,27 +266,50 @@ Auctioner.NewItemController = Ember.Controller.extend({
       }); //note: shorter might be: var item = this.get('model')
          
          item.save(); 
-         var category = this.get('controllers.category.model'); //we get the current controller, and get the category property, and ask it for its model
+         var category = this.get('controllers.category.model');  //we get the current controller, and get the category property, and ask it for its model
          category.get('items').pushObject(item); //here, we make the association. We ask the category for its items, and then call the pushObject method, and push in the item that we just created.
          category.save();
-         this.set('item', '');
          this.transitionToRoute('category', category.id); //transition to the categories route for the category that we just added item in 
     }
   }
 });
 
-NEW:
+//NOTE: after entering data for new item, hitting save, and then clicking new item, form loads with previous data. Further, there are new ember methods for addressing some of the above (such as item.get('category').then(function(category){ category.save...)); but these do not seem to work with current setup on this app.
 
 
+7) *add new-item controller to index.html:
+<script src="controllers/new-item.js"></script>
 
-6) *link to create item on category page
-templates/category.hbs:
 
-<p>{{#link-to 'new-item' this class="btn btn-success"}}New Item{{/link-to}}</p> 
+8) *update category show page to list out items and to link to create-item action:  
 
-//NOTE: would put in {{outlet}} here if you wanted the form to be displayed
+<h2> Category: </h2>
 
-4) *update the categories template to display items below each category
+<h3>{{name}}</h3>
+
+<h3> Items: </h3>
+<div class="row">
+ {{#each item in items itemController="item"}}
+ <div class="col-md-3 well">
+  <div class="col-md-12">
+      <p>{{item.name}}</p>
+      <li>{{item.owner}}</li>
+      <li>{{item.estimated_price}}</li>
+      <button class="btn btn-xs btn-danger" {{action 'delete'}}>delete</button>
+        <h3></h3> 
+   </div>
+ </div>
+ {{/each}}
+</div>
+
+<h5></h5>
+
+<p>{{#link-to 'new-item' classNames="btn btn-primary"}}New Item{{/link-to}}</p>
+
+{{outlet}}
+
+
+9) *update the categories template to display items below each category
 
 <ul>
   {{#each category in model}}
@@ -313,12 +323,30 @@ templates/category.hbs:
       {{item.name}}
       {{item.owner}}
       {{item.estimated_price}}
-      <button class="btn btn-xs btn-danger" {{action 'delete'}}>delete</button>
     </p>
   {{/each}}
 
  {{/each}}
 </ul>
+****
+
+****Add Ability to Delete Comments****
+NOTE: Incomplete (requires further development of the Comment model; initial step provided here for illustrative purposes)
+
+controllers/item.js:
+Auctioner.ItemController = Ember.ObjectController.extend({
+  actions: {
+    delete: function() {
+      if (confirm('Are you sure?')) {
+        this.get('model').destroyRecord();
+        this.transitionToRoute('category', category.id);
+      }
+    }
+  }
+});
+
+index.html:
+   <script src="controllers/item.js"></script>
 
 
 
