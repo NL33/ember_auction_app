@@ -1,0 +1,26 @@
+<h3>New item</h3>
+<form>
+   <div class="form-group">
+      <label for="name">Name</label>
+      {{input value=name  id="name"  class="form-control"}}
+    </div>
+
+    <div class="form-group">
+      <label for="owner">Owner</label>
+      {{input value=owner  id="owner"  class="form-control"}}
+    </div>
+
+    <div class="form-group">
+      <label for="description">Description</label>
+      {{textarea value=description  id="description" class="form-control" rows="5"}}
+    </div>
+
+     <div class="form-group">
+      <label for="estimated_price">Estimated Price</label>
+      {{input value=estimated_price  id="estimated_price"  class="form-control"}}
+    </div>
+
+    <button class="btn btn-primary" {{action 'save'}}>Save</button>
+</form>
+
+

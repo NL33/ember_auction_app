@@ -1,10 +1,25 @@
 <h1> Auctioner! </h1>
 
-<ul>
+
   {{#each category in model}}
-    <li>{{#link-to 'category' category}}{{category.name}}{{/link-to}}</li>
-  {{/each}}
-</ul>
+    <h3>{{#link-to 'category' category}}{{category.name}}{{/link-to}}</h3>
+
+<h4> Items: </h4>
+<div class="row">
+ {{#each item in category.items}}
+ <div class="col-md-3 well">
+	<div class="col-md-12">
+	    <p>{{item.name}}</p>
+	    <li>{{item.owner}}</li>
+	    <li>{{item.estimated_price}}</li>
+	    <button class="btn btn-xs btn-danger" {{action 'delete'}}>delete</button>
+        <h3></h3> 
+   </div>
+ </div>
+ {{/each}}
+</div>
+
+ {{/each}}
 
 <p><a href='#' {{action 'sortByName'}}>Sort By Name</a></p>
 

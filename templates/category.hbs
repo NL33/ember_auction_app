@@ -1,3 +1,24 @@
 <h2> Category: </h2>
 
 <h3>{{name}}</h3>
+
+<h3> Items: </h3>
+<div class="row">
+ {{#each item in items itemController="item"}}
+ <div class="col-md-3 well">
+	<div class="col-md-12">
+	    <p>{{item.name}}</p>
+	    <li>{{item.owner}}</li>
+	    <li>{{item.estimated_price}}</li>
+	    <button class="btn btn-xs btn-danger" {{action 'delete'}}>delete</button>
+        <h3></h3> 
+   </div>
+ </div>
+ {{/each}}
+</div>
+
+<h5></h5>
+
+<p>{{#link-to 'new-item' classNames="btn btn-primary"}}New Item{{/link-to}}</p>
+
+{{outlet}}

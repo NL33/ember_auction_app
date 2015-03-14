@@ -171,6 +171,160 @@ templates/categories.hbs:
     <li>{{#link-to 'category' category}}{{category.name}}{{/link-to}}</li>
   {{/each}}
 </ul>
+***
+
+***Create items within Categories***
+
+1) *create item model, and link to category
+models/item.js:
+
+Auctioner.Item = DS.Model.extend({    
+  name: DS.attr(),
+  desctiption: DS.attr(),
+  owner: DS.attr(),
+  estimated_price: DS.attr(),
+  backstory: DS.attr(),
+  category: DS.belongsTo('category', {async: true}); 
+});
+
+
+2) *add to index.html:
+
+<script src="models/item.js"></script>
+
+
+3) *update category model to reflect relationship
+models/category.js:
+
+Auctioner.Category = DS.Model.extend({    
+  name: DS.attr() 
+  items: DS.hasMany('item', {async: true})
+});
+
+
+4) *Enable creating new Item: add new-item to Router:
+router.js
+(nest new item within category, because that is where new item will be created):
+
+Auctioner.Item = DS.Model.extend({    
+  name: DS.attr(),
+  desctiption: DS.attr(),
+  owner: DS.attr(),
+  estimated_price: DS.attr(),
+  backstory: DS.attr(),
+  image_url: DS.attr(),
+  category: DS.belongsTo('category', {async: true}); 
+});
+
+
+
+
+5) *create new-item template
+<h3>New item</h3>
+
+<form>
+  <div class="form-group">
+      <label for="name">Name</label>
+      {{input value=name  id="name"  class="form-control"}}
+    </div>
+
+    <div class="form-group">
+      <label for="owner">Owner</label>
+      {{input value=owner  id="owner"  class="form-control"}}
+    </div>
+
+    <div class="form-group">
+      <label for="body">Description</label>
+      {{textarea value=description  id="description" class="form-control" rows="5"}}
+    </div>
+
+     <div class="form-group">
+      <label for="estimated_price">Estimated Price</label>
+      {{input value=estimated_price  id="estimated_price"  class="form-control"}}
+    </div>
+
+    <div class="form-group">
+      <label for="backstory">Backstory</label>
+      {{textarea value=backstory  id="backstory" class="form-control" rows="15"}}
+    </div>
+
+   <div class="form-group">
+    <label for="image_url">Image Url</label>
+    {{input value=image_url id="image_url" class="form-control"}}
+  </div>
+
+  <button class="btn btn-primary" {{action 'save'}}>Save</button>
+</form>
+
+
+5) *loadtemplate on index.html
+
+ <script>
+    EmberHandlebarsLoader.loadTemplates(['categories', 'application', 'new-category', 'category', 'new-item'
+    ]);
+  </script>
+
+6) *create controller to handle save action
+controllers/new-item.js
+OLD WAY:
+Auctioner.NewItemController = Ember.Controller.extend({  
+  needs: ['category'], //needs: ember's way of allowing you to access one controller from another. You just list any controllers that you need access to. Here, we have said we need the post controller, which we use at the end of this controller below
+  actions: { 
+    save: function() {
+     var item = this.store.createRecord('item', {  
+      name: this.get('name'),
+      owner: this.get('owner'),
+      description: this.get('description'),
+      estimated_price: this.get('estimated_price'),
+      }); //note: shorter might be: var item = this.get('model')
+         
+         item.save(); 
+         var category = this.get('controllers.category.model'); //we get the current controller, and get the category property, and ask it for its model
+         category.get('items').pushObject(item); //here, we make the association. We ask the category for its items, and then call the pushObject method, and push in the item that we just created.
+         category.save();
+         this.set('item', '');
+         this.transitionToRoute('category', category.id); //transition to the categories route for the category that we just added item in 
+    }
+  }
+});
+
+NEW:
+
+
+
+6) *link to create item on category page
+templates/category.hbs:
+
+<p>{{#link-to 'new-item' this class="btn btn-success"}}New Item{{/link-to}}</p> 
+
+//NOTE: would put in {{outlet}} here if you wanted the form to be displayed
+
+4) *update the categories template to display items below each category
+
+<ul>
+  {{#each category in model}}
+    <li>{{#link-to 'category' category}}{{category.name}}{{/link-to}}</li>
+
+  <h3> Items </h3>
+
+
+  {{#each item in items itemController="item"}}
+    <p>
+      {{item.name}}
+      {{item.owner}}
+      {{item.estimated_price}}
+      <button class="btn btn-xs btn-danger" {{action 'delete'}}>delete</button>
+    </p>
+  {{/each}}
+
+ {{/each}}
+</ul>
+
+
+
+
+
+
 
 
 
